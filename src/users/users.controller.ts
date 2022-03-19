@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { BuyersService, SellersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, CreateBuyerDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,14 +17,14 @@ export class UsersController {
     private readonly sellersService: SellersService,
   ) {}
 
-  @Post('/seller')
+  @Post('/sellers')
   createSeller(@Body() createUserDto: CreateUserDto) {
     return this.sellersService.create();
   }
 
-  @Post('/buyer')
-  createBuyer(@Body() createUserDto: CreateUserDto) {
-    return this.buyersService.create();
+  @Post('/buyers')
+  createBuyer(@Body() createBuyerDto: CreateBuyerDto) {
+    return this.buyersService.create(createBuyerDto);
   }
 
   // @Get()
