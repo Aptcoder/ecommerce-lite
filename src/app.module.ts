@@ -1,11 +1,25 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ProductsModule } from './product/products.module';
+import { ProductsModule } from './products/products.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import * as config from 'config';
 
 @Module({
-  imports: [ProductsModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: config.get<string>('PG_DB_USERNAME'),
+      password: config.get<string>('PG_DB_PASSWORD'),
+      database: 'ecommerce-lite',
+      synchronize: true,
+      autoLoadEntities: true,
+    }),
+    ProductsModule,
+    UsersModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
