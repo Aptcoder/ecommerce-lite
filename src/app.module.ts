@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ProductsModule } from './products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 import * as config from 'config';
 
 @Module({
@@ -18,6 +19,7 @@ import * as config from 'config';
     }),
     ProductsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

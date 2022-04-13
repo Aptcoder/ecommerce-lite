@@ -1,14 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode } from '@nestjs/common';
 import { BuyersService, SellersService } from './users.service';
-import { CreateUserDto, CreateBuyerDto } from './dto/create-user.dto';
+import { CreateBuyerDto, CreateSellerDto } from './dto/create-user.dto';
+import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,13 +11,25 @@ export class UsersController {
   ) {}
 
   @Post('/sellers')
-  createSeller(@Body() createUserDto: CreateUserDto) {
-    return this.sellersService.create();
+  createSeller(@Body() createSellerDto: CreateSellerDto) {
+    return this.sellersService.create(createSellerDto);
   }
 
   @Post('/buyers')
   createBuyer(@Body() createBuyerDto: CreateBuyerDto) {
     return this.buyersService.create(createBuyerDto);
+  }
+
+  @HttpCode(200)
+  @Post('/sellers/auth')
+  authSeller(@Body() authUserDto: AuthUserDto) {
+    return this.sellersService.authSeller(authUserDto);
+  }
+
+  @HttpCode(200)
+  @Post('/buyers/auth')
+  authBuyer(@Body() authUserDto: AuthUserDto) {
+    return this.buyersService.authBuyer(authUserDto);
   }
 
   // @Get()

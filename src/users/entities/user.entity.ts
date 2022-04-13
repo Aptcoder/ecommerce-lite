@@ -1,6 +1,6 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,6 +17,9 @@ export class User {
   })
   email: string;
 
+  @Exclude({
+    toPlainOnly: true,
+  })
   @Column({
     nullable: false,
   })
@@ -24,16 +27,10 @@ export class User {
 }
 
 @Entity()
-export class Buyer {
-  @Column(() => User)
-  user: User;
-}
+export class Buyer extends User {}
 
 @Entity()
-export class Seller {
-  @Column(() => User)
-  user: User;
-
+export class Seller extends User {
   @Column()
   displayName: string;
 }
