@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { Buyer, Seller } from 'src/users/entities/user.entity';
 import { BuyersService, SellersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-
+import { AuthUserDto } from 'src/users/dto/auth-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -16,7 +16,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateBuyer(email: string, password: string) {
+  async authBuyer(authUserDto: AuthUserDto) {
+    const { email, password } = authUserDto;
     const buyer: Buyer = await this.buyersService.findByEmail(email);
     if (!buyer) {
       throw new NotFoundException('Buyer not found');
@@ -30,10 +31,11 @@ export class AuthService {
       buyerId: buyer.id,
     };
     const token = this.jwtService.sign(payload);
-    return token;
+    return { token };
   }
 
-  async validateSeller(email: string, password: string) {
+  async authSeller(authUserDto: AuthUserDto) {
+    const { email, password } = authUserDto;
     const seller: Seller = await this.sellersService.findByEmail(email);
     if (!seller) {
       throw new NotFoundException('Seller not found');
@@ -47,6 +49,6 @@ export class AuthService {
       buyerId: seller.id,
     };
     const token = this.jwtService.sign(payload);
-    return token;
+    return { token };
   }
 }

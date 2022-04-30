@@ -1,20 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {
-  Injectable,
-  BadRequestException,
-  HttpException,
-  NotFoundException,
-} from '@nestjs/common';
-import {
-  CreateBuyerDto,
-  CreateSellerDto,
-  CreateUserDto,
-} from './dto/create-user.dto';
+import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
+import { CreateBuyerDto, CreateSellerDto } from './dto/create-user.dto';
 import { Buyer, Seller } from './entities/user.entity';
 import { BuyersRepository, SellersRepository } from './user.repo';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { AuthUserDto } from './dto/auth-user.dto';
 
 interface UsersService {
   create(createBuyerDto?: CreateBuyerDto, createSeller?: CreateSellerDto): any;
@@ -46,23 +36,6 @@ export class BuyersService implements UsersService {
       }
       throw new HttpException('Something unexpected went wrong', 500);
     }
-  }
-  async authBuyer(authUserDto: AuthUserDto) {
-    const { email, password } = authUserDto;
-    const buyer: Buyer = await this.buyersRepository.findByEmail(email);
-    if (!buyer) {
-      throw new NotFoundException('Buyer not found');
-    }
-    const comparePassword = bcrypt.compare(password, buyer.password);
-    if (!comparePassword) {
-      throw new BadRequestException('Invalid password');
-    }
-    const payload = {
-      userType: 'buyer',
-      buyerId: buyer.id,
-    };
-    const token = this.jwtService.sign(payload);
-    return { token, buyer };
   }
 
   async auth(email: string) {
@@ -103,28 +76,6 @@ export class SellersService implements UsersService {
       throw new HttpException('Something unexpected went wrong', 500);
     }
   }
-
-  async authSeller(authUserDto: AuthUserDto) {
-    const { email, password } = authUserDto;
-    const seller: Seller = await this.sellersRepository.findByEmail(email);
-    if (!seller) {
-      throw new NotFoundException('Seller not found');
-    }
-    const comparePassword = bcrypt.compare(password, seller.password);
-    if (!comparePassword) {
-      throw new BadRequestException('Invalid password');
-    }
-    const payload = {
-      userType: 'seller',
-      buyerId: seller.id,
-    };
-    const token = this.jwtService.sign(payload);
-    return { token, seller };
-  }
-
-  // async auth(email: string, password: string) {
-  //   await this.auth;
-  // }
 
   async findByEmail(email: string) {
     return this.sellersRepository.findByEmail(email);

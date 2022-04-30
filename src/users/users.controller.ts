@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, HttpCode } from '@nestjs/common';
 import { BuyersService, SellersService } from './users.service';
 import { CreateBuyerDto, CreateSellerDto } from './dto/create-user.dto';
-import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -11,25 +10,15 @@ export class UsersController {
   ) {}
 
   @Post('/sellers')
+  @HttpCode(201)
   createSeller(@Body() createSellerDto: CreateSellerDto) {
     return this.sellersService.create(createSellerDto);
   }
 
   @Post('/buyers')
+  @HttpCode(201)
   createBuyer(@Body() createBuyerDto: CreateBuyerDto) {
     return this.buyersService.create(createBuyerDto);
-  }
-
-  @HttpCode(200)
-  @Post('/sellers/auth')
-  authSeller(@Body() authUserDto: AuthUserDto) {
-    return this.sellersService.authSeller(authUserDto);
-  }
-
-  @HttpCode(200)
-  @Post('/buyers/auth')
-  authBuyer(@Body() authUserDto: AuthUserDto) {
-    return this.buyersService.authBuyer(authUserDto);
   }
 
   // @Get()
