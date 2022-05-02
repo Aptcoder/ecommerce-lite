@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { ProductsService } from './products.service';
-import JwtGuard from 'src/utils/guards/jwt.guard';
+import JwtGuard from '../utils/guards/jwt.guard';
 import Roles from '../utils/decorators/role.decorator';
 import { RolesGuard } from '../utils/guards/roles.guard';
 
@@ -19,6 +27,11 @@ export class ProductsController {
   @UseGuards(JwtGuard, RolesGuard)
   @Post('/')
   async createProduct(@Body() createProductDto: CreateProductDto) {
-    this.productsService.create(createProductDto);
+    return this.productsService.create(createProductDto);
+  }
+
+  @Delete('/')
+  async deleteProduct(@Param('productId') productId: string) {
+    return this.productsService.delete(productId);
   }
 }

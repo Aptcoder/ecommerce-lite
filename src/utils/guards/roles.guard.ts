@@ -17,7 +17,6 @@ export class RolesGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    console.log('u', user);
     if (!roles.includes(user.userType)) {
       throw new HttpException('Not allowed', 403);
     }
