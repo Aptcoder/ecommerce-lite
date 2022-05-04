@@ -25,7 +25,7 @@ describe('Products controller', () => {
     const spy = jest
       .spyOn(productsService, 'fetchAll')
       .mockImplementation(async () => Promise.resolve(mock_results));
-    const result = await productsController.getAllProducts();
+    const result = await productsController.getAllProducts({});
     expect(spy).toHaveBeenCalled();
     expect(result).toBe(mock_results);
   });

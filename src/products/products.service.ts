@@ -1,6 +1,7 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import FilterProductDto from './dtos/filter-product.dto';
 import Product from './product.entity';
 import { ProductsRepository } from './products.repo';
 
@@ -9,8 +10,8 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private productsRepository: ProductsRepository,
   ) {}
-  async fetchAll(): Promise<Product[]> {
-    return await this.productsRepository.fetchAll();
+  async fetchAll(filters?: FilterProductDto): Promise<Product[]> {
+    return await this.productsRepository.fetchAll(filters);
   }
 
   async create(createProductDto: CreateProductDto) {
@@ -26,19 +27,13 @@ export class ProductsService {
   }
 
   async delete(productId: string) {
-    try {
-      const toBeDeletedProduct = await this.productsRepository.findOne(
-        productId,
-      );
-      if (!toBeDeletedProduct) {
-        throw new NotFoundException('Product not found');
-      }
-      const deletedProduct = await this.productsRepository.remove(
-        toBeDeletedProduct,
-      );
-      return deletedProduct;
-    } catch (err) {
-      throw new HttpException('Something unexpected happened', 500);
+    const toBeDeletedProduct = await this.productsRepository.findOne(productId);
+    if (!toBeDeletedProduct) {
+      throw new NotFoundException('Product not found');
     }
+    const deletedProduct = await this.productsRepository.remove(
+      toBeDeletedProduct,
+    );
+    return deletedProduct;
   }
 }

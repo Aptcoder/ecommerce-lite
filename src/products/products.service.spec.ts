@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import ProductRepositoryFake from './fakes/product.repo.fake';
 import Product from './product.entity';
 import { ProductsRepository } from './products.repo';
 import { ProductsService } from './products.service';
@@ -14,22 +15,6 @@ describe('Products service', () => {
     name: 'Addide',
     price: 80000,
   };
-  const mock_product_with_id = {
-    id: 'sample-id',
-    ...mock_product,
-  };
-  const mock_products = [mock_product];
-  class ProductRepositoryFake {
-    public create = jest.fn().mockImplementation(() => {
-      return mock_product_with_id;
-    });
-    public save = async (product: Product): Promise<Product> => {
-      return Promise.resolve(mock_product_with_id);
-    };
-    public async remove(): Promise<void> {}
-    public async findOne(): Promise<void> {}
-    public fetchAll = jest.fn();
-  }
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -47,8 +32,20 @@ describe('Products service', () => {
   });
 
   it('Should fetch all products', async () => {
+    const fetchAllSpy = jest.spyOn(productsRepository, 'fetchAll');
     await productsService.fetchAll();
-    expect(productsRepository.fetchAll).toHaveBeenCalled();
+    expect(fetchAllSpy).toHaveBeenCalled();
+  });
+
+  it('Should fetch relevant products', async () => {
+    const filter = {
+      name: 'Addidas',
+      price: '400',
+    };
+    const fetchAllSpy = jest.spyOn(productsRepository, 'fetchAll');
+    await productsService.fetchAll(filter);
+    expect(fetchAllSpy).toHaveBeenCalled();
+    expect(fetchAllSpy).toHaveBeenCalledWith(filter);
   });
 
   it('Should save and create a product', async () => {
@@ -62,5 +59,33 @@ describe('Products service', () => {
     expect(createSpy).toHaveBeenCalled();
     expect(createSpy).toHaveBeenCalledWith(createProductData);
     expect(saveSpy).toBeCalled();
+  });
+
+  it('Should delete a product', async () => {
+    const findSpy = jest.spyOn(productsRepository, 'findOne');
+    const removeSpy = jest.spyOn(productsRepository, 'remove');
+
+    const result = await productsService.delete('random0');
+    expect(findSpy).toBeCalled();
+    expect(findSpy).toBeCalledWith('random0');
+    expect(removeSpy).toBeCalledWith(ProductRepositoryFake.products[0]);
+    expect(result).toBe(ProductRepositoryFake.products[0]);
+  });
+
+  it('Should throw error if user not found when deleting ', async () => {
+    const findSpy = jest
+      .spyOn(productsRepository, 'findOne')
+      .mockImplementation(() => {
+        return null;
+      });
+    const removeSpy = jest.spyOn(productsRepository, 'remove');
+    try {
+      await productsService.delete('random0');
+    } catch (e) {
+      expect(e).toBeInstanceOf(NotFoundException);
+    }
+    expect(findSpy).toBeCalled();
+    expect(findSpy).toBeCalledWith('random0');
+    expect(removeSpy).not.toBeCalled();
   });
 });
